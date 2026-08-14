@@ -6,3 +6,4 @@ runs/
 *.zip
 .DS_Store
 results/pilot/
+results/m2/

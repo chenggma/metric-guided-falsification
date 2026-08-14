@@ -88,6 +88,9 @@ def train(
         raise ValueError(f"unknown arm {arm!r}")
     os.makedirs(outdir, exist_ok=True)
     jsonl = os.path.join(outdir, "train_episodes.jsonl")
+    # Truncate: the logger appends, so a retry after an interrupted run would
+    # otherwise splice the dead run's episodes onto the new one.
+    open(jsonl, "w").close()
     env = make_env(arm, master_seed=seed, jsonl_path=jsonl,
                    calibration_path=calibration_path, log_all_metrics=False,
                    shaping=shaping)

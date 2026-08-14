@@ -20,11 +20,14 @@ from falsify.search.rl_adversary import make_env
 
 
 def main(a) -> None:
+    if a.out:
+        open(a.out, "w").close()  # logger appends; never splice reruns
     env = make_env(
         a.arm,
         master_seed=a.master_seed,
         jsonl_path=a.out,
         calibration_path=a.calibration,
+        shaping=a.shaping,
     )
     if a.random:
         policy = OUPolicy()
@@ -54,6 +57,8 @@ def main(a) -> None:
     summary = {
         "policy": "random-OU" if a.random else a.model,
         "arm": a.arm,
+        "shaping": a.shaping,
+        "master_seed": a.master_seed,
         "episodes": a.episodes,
         "steps": total_steps,
         "outcomes": dict(outcomes),
@@ -72,6 +77,7 @@ if __name__ == "__main__":
     ap.add_argument("--arm", default="sparse",
                     choices=["sparse", "inv_ttc", "neg_tts_margin", "pora"])
     ap.add_argument("--calibration", default=None)
+    ap.add_argument("--shaping", default="raw", choices=["raw", "pbrs"])
     ap.add_argument("--episodes", type=int, default=200)
     ap.add_argument("--master-seed", type=int, required=True)
     ap.add_argument("--out", default=None)
