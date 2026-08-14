@@ -21,7 +21,11 @@ class OUPolicy:
         self.rng = rng or np.random.default_rng()
         self.x = np.zeros(2)
 
-    def reset(self) -> None:
+    def reset(self, seed: Optional[int] = None) -> None:
+        """Reset the noise state; with `seed`, also reseed the generator so
+        the episode's action sequence is reproducible in isolation."""
+        if seed is not None:
+            self.rng = np.random.default_rng(seed)
         self.x = np.zeros(2)
 
     def act(self, obs=None) -> np.ndarray:
@@ -51,7 +55,7 @@ def run_episodes(env, policy, seeds, jsonl_path: Optional[str] = None) -> List[E
     sink = open(jsonl_path, "a") if jsonl_path else None
     try:
         for seed in seeds:
-            policy.reset()
+            policy.reset(seed=int(seed))
             obs, _ = env.reset(seed=int(seed))
             done, steps, total = False, 0, 0.0
             max_m: dict = {}

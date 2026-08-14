@@ -10,7 +10,7 @@ across arms is WHICH states receive the high percentiles.
 """
 
 import json
-from bisect import bisect_right
+from bisect import bisect_left
 from typing import Sequence
 
 
@@ -36,9 +36,14 @@ class PercentileNormalizer:
         return cls(grid)
 
     def __call__(self, raw: float) -> float:
-        """Fraction of the quantile grid strictly below `raw` (ties averaged
-        by grid multiplicity), clipped to [0, 1]."""
-        lo = bisect_right(self.q, float(raw))
+        """Fraction of the quantile grid STRICTLY below `raw`, in [0, 1].
+
+        Strictly-below (not mid-rank) on purpose: the modal "no conflict"
+        value - inv TTC 0.0, the TTS floor - ties with a large share of the
+        calibration mass, and it must map to shaped reward 0, not to its
+        CDF mid-rank. Idling earns nothing under every arm.
+        """
+        lo = bisect_left(self.q, float(raw))
         return lo / len(self.q)
 
     def to_json(self) -> str:

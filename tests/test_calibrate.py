@@ -25,6 +25,11 @@ class TestPercentileNormalizer(unittest.TestCase):
         n = PercentileNormalizer.fit(range(1001), n_points=1001)
         self.assertAlmostEqual(n(500), 0.5, delta=0.01)
 
+    def test_modal_floor_value_maps_to_zero(self):
+        # "no conflict" ties with most of the calibration mass and must earn 0
+        n = PercentileNormalizer.fit([0.0] * 80 + [1.0, 2.0] * 10, n_points=101)
+        self.assertEqual(n(0.0), 0.0)
+
     def test_json_roundtrip(self):
         n = PercentileNormalizer.fit([1.5, 2.5, 3.5, 9.0], n_points=5)
         m = PercentileNormalizer.from_json(n.to_json())

@@ -5,3 +5,4 @@ results/raw/
 runs/
 *.zip
 .DS_Store
+results/pilot/
