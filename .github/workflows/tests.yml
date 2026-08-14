@@ -17,6 +17,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       # Core deps only: the unit tests exercise the env, metrics, fault
       # labeling, and calibration; RL training (stable-baselines3/torch) is
-      # run locally and not needed here.
+      # run locally and not needed here. pora-replication is not on PyPI,
+      # so it is installed from git before resolving the package.
+      - run: pip install "pora-replication @ git+https://github.com/chenggma/pora-replication"
       - run: pip install -e .
       - run: python -m unittest discover -s tests -v
