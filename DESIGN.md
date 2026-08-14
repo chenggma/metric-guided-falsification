@@ -7,8 +7,11 @@ never change the design retroactively without a logged amendment at the bottom.
 
 RL-based falsification (adaptive stress testing, Koren et al. 2018; survey:
 Corso et al., JAIR 2021) trains an adversary to drive a system under test (SUT)
-into failure. The adversarial reward is almost always a hand-picked risk proxy
-(miss distance, TTC, RSS violation) and the choice is rarely defended. We ask,
+into failure. Its reward is typically augmented with a dense safety-metric
+term - an established, argued technique reported to *improve* discovery
+(Corso et al. 2019 with RSS and trajectory-dissimilarity terms; Cai et al.,
+T-IV 2025, with RSS + DTW). What that literature does not do is hold the
+pipeline fixed and vary *which* metric supplies the dense term. We ask,
 empirically:
 
 > When the *only* thing that changes between falsification runs is the risk
@@ -195,6 +198,9 @@ calibration), so "found more failures" is never an artifact of more compute.
 * The effort penalty is a plausibility *pressure*, not a validated
   naturalistic driver model.
 
+Positioning, prior work, and the framing this project had to retract are in
+[RELATED_WORK.md](RELATED_WORK.md).
+
 ## Amendments
 
 * 2026-08-14 (M0, pre-results): two changes driven by smoke testing, made
@@ -208,6 +214,14 @@ calibration), so "found more failures" is never an artifact of more compute.
   failure replay (§7.4). Motive: wall clock on the 8 GB pilot machine -
   four concurrent all-metric trainings degraded 12x from memory contention;
   arms now run sequentially. No analysis is lost (failures replay exactly).
+* 2026-08-14 (literature check, pre-M2 results): §1's premise that the
+  reward metric choice "is rarely defended" was **false** and is retracted -
+  dense safety-metric augmentation is argued and evaluated in Corso et al.
+  2019 and Cai et al. 2025, both reporting gains. The contribution is
+  restated as a boundary condition on an accepted technique rather than a
+  neglected gap; PBRS is explicitly not claimed as novel. See
+  RELATED_WORK.md. No experimental design change follows - the arms, seeds,
+  and analysis are unchanged; only the claims are.
 * 2026-08-14 (post-pilot, pre-M2): pilot (1 seed/arm, results/PILOT.md)
   passed the go/no-go (sparse beats random-OU ~24x) but inverted H1: dense
   shaping induced reward farming (hover-and-collect; a local optimum the
