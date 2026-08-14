@@ -36,7 +36,7 @@ Last quarter of training, per arm:
 | neg_tts_margin | 85.8% | 35.2 | 0.8 |
 | pora | 93.3% | 63.1 | 0.0 |
 
-Three observations pin the mechanism:
+Four observations pin the mechanism:
 
 1. **Dense arms farm instead of crashing.** A pora-arm timeout episode
    collects ~63 of shaped reward by hovering near the ego with risk held
@@ -53,7 +53,17 @@ Three observations pin the mechanism:
    inv_ttc ≤ 12.2). Even compared *undiscounted*, farming (63.1) loses to
    the discounted crash (133). The dense gradient nevertheless pulls the
    policy into the hover basin and keeps it there.
-3. **Dose-response.** Farmability tracks how much of the state space the
+3. **The obvious fix was already in place and did not work.** The crash
+   bonus B = 150 was chosen during M0 design *specifically* to prevent
+   farming: it was set above the ~120 maximum undiscounted reward an
+   adversary could collect by idling out a full episode, so that crashing
+   would dominate. It still farmed. This is the point - "make the crash pay
+   more than the farm" fixes a *global* optimum, and the pathology is a
+   *local* one. No bonus large enough to be reachable by the gradient
+   exists, because the gradient never points that way once the hover basin
+   is entered. This is why M2 changes the shaping *form* (PBRS) rather than
+   the bonus magnitude.
+4. **Dose-response.** Farmability tracks how much of the state space the
    metric scores above zero (calibration medians: pora 0.018 > 0 almost
    everywhere; inv_ttc exactly 0 until velocities conflict; TTS at its
    floor without a conflict). The suppression ranks in the same order:
