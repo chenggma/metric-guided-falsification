@@ -17,7 +17,9 @@ if __name__ == "__main__":
     ap.add_argument("--seed", type=int, required=True)
     ap.add_argument("--steps", type=int, default=100_000)
     ap.add_argument("--calibration", default=None)
+    ap.add_argument("--shaping", default="raw", choices=["raw", "pbrs"])
     ap.add_argument("--outdir", required=True)
     a = ap.parse_args()
-    path = train(a.arm, a.seed, a.steps, a.outdir, calibration_path=a.calibration)
+    path = train(a.arm, a.seed, a.steps, a.outdir, calibration_path=a.calibration,
+                 shaping=a.shaping)
     print(f"saved {path}")

@@ -42,6 +42,7 @@ def make_env(
     jsonl_path: Optional[str] = None,
     calibration_path: Optional[str] = None,
     log_all_metrics: bool = True,
+    shaping: str = "raw",
 ) -> SeededEpisodeLogger:
     """Adversarial env for one reward arm, wrapped for seeded logging.
 
@@ -66,6 +67,8 @@ def make_env(
         reward_metric=arm,
         normalizer=normalizer,
         log_all_metrics=log_all_metrics,
+        shaping=shaping,
+        gamma=PPO_KWARGS["gamma"],  # PBRS invariance requires matching discounts
     )
     return SeededEpisodeLogger(env, master_seed=master_seed, jsonl_path=jsonl_path)
 
@@ -76,6 +79,7 @@ def train(
     total_steps: int,
     outdir: str,
     calibration_path: Optional[str] = None,
+    shaping: str = "raw",
 ) -> str:
     """Train one PPO adversary; returns the model path."""
     from stable_baselines3 import PPO  # lazy: keeps core import torch-free
@@ -85,7 +89,8 @@ def train(
     os.makedirs(outdir, exist_ok=True)
     jsonl = os.path.join(outdir, "train_episodes.jsonl")
     env = make_env(arm, master_seed=seed, jsonl_path=jsonl,
-                   calibration_path=calibration_path, log_all_metrics=False)
+                   calibration_path=calibration_path, log_all_metrics=False,
+                   shaping=shaping)
 
     model = PPO("MlpPolicy", env, seed=seed, device="cpu", verbose=0, **PPO_KWARGS)
     model.learn(total_timesteps=total_steps)
@@ -96,6 +101,7 @@ def train(
         json.dump(
             {
                 "arm": arm,
+                "shaping": shaping,
                 "seed": seed,
                 "total_steps": total_steps,
                 "env_episodes": env.episodes,

@@ -60,10 +60,14 @@ class AdversarialEnv(gym.Env):
         crash_bonus: float = 150.0,
         normalizer: Optional[Normalizer] = None,
         log_all_metrics: bool = True,
+        shaping: str = "raw",
+        gamma: float = 0.99,
     ):
         super().__init__()
         if reward_metric not in METRICS:
             raise ValueError(f"unknown metric {reward_metric!r}")
+        if shaping not in ("raw", "pbrs"):
+            raise ValueError(f"unknown shaping {shaping!r}")
         self.sut = sut
         self.reward_metric = reward_metric
         self.effort_lambda = effort_lambda
@@ -71,6 +75,14 @@ class AdversarialEnv(gym.Env):
         self.normalizer = normalizer
         self.log_all_metrics = log_all_metrics
         self.n_neighbors = n_neighbors
+        # Potential-based shaping (Ng et al. 1999): shaped_t = γ·Φ(s')-Φ(s)
+        # with Φ the normalized metric. Telescopes to a policy-invariant
+        # constant, so the "hover and farm risk" optimum the pilot exposed
+        # (results/PILOT.md) cannot exist under it. `gamma` must match the
+        # RL algorithm's discount for the invariance to hold.
+        self.shaping = shaping
+        self.gamma = gamma
+        self._phi_prev = 0.0
 
         cfg = dict(DEFAULT_CONFIG)
         cfg.update(config or {})
@@ -94,7 +106,20 @@ class AdversarialEnv(gym.Env):
         self._select_attacker()
         self._prev_cmd = np.zeros(2)
         self._crash_paid = False
+        self._phi_prev = self._phi()
         return self._obs(), {"attacker_index": self._attacker_index}
+
+    def _phi(self) -> float:
+        """Current normalized potential Φ(s) for PBRS."""
+        e = self.inner.unwrapped
+        ego = e.vehicle
+        ego_s = from_vehicle(ego)
+        foes = foes_within(
+            ego_s, [from_vehicle(v) for v in e.road.vehicles if v is not ego],
+            ATTACK_RADIUS,
+        )
+        raw = METRICS[self.reward_metric](ego_s, foes)
+        return self.normalizer(raw) if self.normalizer else raw
 
     def _select_attacker(self) -> None:
         e = self.inner.unwrapped
@@ -139,7 +164,12 @@ class AdversarialEnv(gym.Env):
             raw = METRICS[self.reward_metric](ego_s, foes)
             metrics[self.reward_metric] = raw
 
-        shaped = self.normalizer(raw) if self.normalizer else raw
+        phi = self.normalizer(raw) if self.normalizer else raw
+        if self.shaping == "pbrs":
+            shaped = self.gamma * phi - self._phi_prev
+        else:
+            shaped = phi
+        self._phi_prev = phi
         # |a[1]| is already the fraction of the speed-dependent authority used
         effort = 0.5 * (abs(accel) / max(-ACCEL_MIN, ACCEL_MAX) + abs(float(a[1])))
 
