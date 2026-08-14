@@ -44,9 +44,15 @@ Three observations pin the mechanism:
    *and* ends the episode, so the shaped signal actively rewards not
    finishing the attack.
 2. **Farming is locally, not globally, optimal.** A non-trivial crash at
-   step ~12 pays ~0.99¹²·150 ≈ 133 discounted - more than any farming
-   return. The dense gradient nevertheless pulls the policy into the hover
-   basin and keeps it there.
+   step ~12 (the sparse arm's typical time-to-crash) is worth
+   0.99¹²·150 ≈ 133 discounted. Farming pays less, under discounting that
+   matches: at the pora arm's late-training rate (63.1 undiscounted over
+   121 steps), spreading that rate across the episode gives at most
+   ≈ 36.7 discounted - and less than that in fact, since the shaped rate
+   is not uniform. The same holds for the other arms (TTS ≤ 20.5,
+   inv_ttc ≤ 12.2). Even compared *undiscounted*, farming (63.1) loses to
+   the discounted crash (133). The dense gradient nevertheless pulls the
+   policy into the hover basin and keeps it there.
 3. **Dose-response.** Farmability tracks how much of the state space the
    metric scores above zero (calibration medians: pora 0.018 > 0 almost
    everywhere; inv_ttc exactly 0 until velocities conflict; TTS at its
