@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "metric-guided-falsification"
+version = "0.1.0"
+description = "Does the choice of risk metric as adversarial reward shape which driving-policy failures RL falsification finds?"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Cheng Ma" }]
+dependencies = [
+    "numpy>=1.24",
+    "gymnasium>=1.0",
+    "highway-env>=1.12",
+    "pora-replication",
+]
+
+[project.optional-dependencies]
+rl = ["stable-baselines3>=2.3", "cma>=3.3", "matplotlib>=3.8"]
+
+[tool.setuptools]
+packages = ["falsify", "falsify.env", "falsify.search"]
