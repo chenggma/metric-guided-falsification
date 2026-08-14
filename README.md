@@ -21,10 +21,16 @@ Third repository in a sequence:
 **this** (the metric becomes the optimization target of an active
 adversary).
 
-**Status: M0 - environment, metrics, baselines, and tests. No experimental
-results yet; nothing here should be cited as a finding.** The full
-experimental contract - hypotheses registered before any run, reward
-design, confound controls, evaluation plan, milestones - is in
+**Status: M1 pilot complete (1 seed per arm - a go/no-go, not a finding).**
+The pilot passed its go/no-go (the sparse-reward PPO adversary finds
+non-trivial failures at ~24x the random baseline on held-out seeds, all of
+them an interpretable cut-in-and-brake weakness of the IDM ego) and
+*inverted* the registered H1: dense metric shaping induced reward farming
+- hover near the ego, collect shaped risk, never finish the attack - with
+a clean dose-response (PORA, the densest signal, fell to zero non-trivial
+failures; sparse was unharmed). Numbers, mechanism evidence, and the
+resulting M2 re-registration (potential-based shaping arms) are in
+[results/PILOT.md](results/PILOT.md). The full experimental contract is in
 [DESIGN.md](DESIGN.md).
 
 ## What exists

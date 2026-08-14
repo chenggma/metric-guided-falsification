@@ -208,3 +208,14 @@ calibration), so "found more failures" is never an artifact of more compute.
   failure replay (§7.4). Motive: wall clock on the 8 GB pilot machine -
   four concurrent all-metric trainings degraded 12x from memory contention;
   arms now run sequentially. No analysis is lost (failures replay exactly).
+* 2026-08-14 (post-pilot, pre-M2): pilot (1 seed/arm, results/PILOT.md)
+  passed the go/no-go (sparse beats random-OU ~24x) but inverted H1: dense
+  shaping induced reward farming (hover-and-collect; a local optimum the
+  dense gradient locks in), with a dose-response - pora worst, sparse
+  unharmed. M2 design change, registered before any M2 run: add
+  potential-based shaping arms (r = γ·Φ(s')-Φ(s), Ng et al. 1999) for each
+  dense metric. **H1-revised:** under PBRS density helps; under raw shaping
+  density harms. H2/H3 unchanged, now evaluated under both shaping forms.
+  Farming diagnostics (timeout share, timeout-episode return) become
+  first-class reported outcomes. Arms: sparse + 3 raw + 3 PBRS = 7, ≥5
+  seeds each.
