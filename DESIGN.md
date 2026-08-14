@@ -146,9 +146,12 @@ calibration), so "found more failures" is never an artifact of more compute.
    heading at impact, ego maneuver state, attacker-relative position bin,
    metric values 1 s before impact), cluster with a fixed pipeline, report
    discovered-cluster counts vs budget (coverage curves).
-4. **Cross-metric transfer matrix:** every logged step records *all three*
-   metrics regardless of the reward arm, so for failures found by arm `i` we
-   read off metric `j`'s trajectory max. Asymmetries = blind spots.
+4. **Cross-metric transfer matrix:** evaluation episodes and replayed
+   failures record *all three* metrics regardless of the reward arm, so for
+   failures found by arm `i` we read off metric `j`'s trajectory max.
+   Asymmetries = blind spots. (Training steps record only the reward arm's
+   metric, for speed; any training-time failure is replayable exactly from
+   its (seed, policy) pair, so nothing is lost.)
 5. **Timeliness echo:** per-failure alarm lead time for each metric at the
    5%-FPR threshold (thresholds recalibrated on this environment's negative
    samples, methodology identical to risk-metric-bench).
@@ -200,3 +203,8 @@ calibration), so "found more failures" is never an artifact of more compute.
   super-human >30 m/s² input; random attackers left the road in <1 s).
   (2) Crash bonus gated on the coarse non-triviality label and raised to
   150 (see §5 for both rationales).
+* 2026-08-14 (M1, pre-results): training steps log only the reward arm's
+  metric; all-metric logging stays on for calibration, evaluation, and
+  failure replay (§7.4). Motive: wall clock on the 8 GB pilot machine -
+  four concurrent all-metric trainings degraded 12x from memory contention;
+  arms now run sequentially. No analysis is lost (failures replay exactly).

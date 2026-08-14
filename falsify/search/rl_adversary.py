@@ -41,12 +41,17 @@ def make_env(
     master_seed: int,
     jsonl_path: Optional[str] = None,
     calibration_path: Optional[str] = None,
+    log_all_metrics: bool = True,
 ) -> SeededEpisodeLogger:
     """Adversarial env for one reward arm, wrapped for seeded logging.
 
     The sparse arm takes no normalizer (its shaped term is identically 0);
     every dense arm REQUIRES a calibration artifact - training with raw
     metric scales would reintroduce the reward-scale confound.
+
+    `log_all_metrics=False` computes only the reward arm's metric per step
+    (training-speed mode: PORA at ~10 ms/call dominates wall clock if every
+    arm logs it). Evaluation and failure replay keep the default True.
     """
     normalizer = None
     if arm != "sparse":
@@ -56,7 +61,12 @@ def make_env(
                 "run scripts/calibrate.py first"
             )
         normalizer = load_normalizers(calibration_path)[arm]
-    env = AdversarialEnv(sut=IDMEgoSUT(), reward_metric=arm, normalizer=normalizer)
+    env = AdversarialEnv(
+        sut=IDMEgoSUT(),
+        reward_metric=arm,
+        normalizer=normalizer,
+        log_all_metrics=log_all_metrics,
+    )
     return SeededEpisodeLogger(env, master_seed=master_seed, jsonl_path=jsonl_path)
 
 
@@ -75,7 +85,7 @@ def train(
     os.makedirs(outdir, exist_ok=True)
     jsonl = os.path.join(outdir, "train_episodes.jsonl")
     env = make_env(arm, master_seed=seed, jsonl_path=jsonl,
-                   calibration_path=calibration_path)
+                   calibration_path=calibration_path, log_all_metrics=False)
 
     model = PPO("MlpPolicy", env, seed=seed, device="cpu", verbose=0, **PPO_KWARGS)
     model.learn(total_timesteps=total_steps)
