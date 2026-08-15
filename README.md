@@ -23,17 +23,22 @@ Third repository in a sequence:
 **this** (the metric becomes the optimization target of an active
 adversary).
 
-**Status: M2 complete at 5 seeds/arm; extending to 7 for statistical power.**
+**Status: M2 complete — 7 arms x 7 seeds, 49/49 runs, 0 failures.**
 Headline ([results/M2.md](results/M2.md)): with a properly gated outcome,
 *dense shaping is necessary but only the potential-based form delivers it*.
-The sparse-reward adversary found zero severe failures on all five seeds -
-worse than random noise - while every raw-shaped arm collapsed into reward
-farming (84-95% of late episodes end in timeout, hovering for shaped reward
-and never finishing the attack) and every PBRS arm found failures on 4 of 5
-seeds, PORA best (median 13/200). Three contrasts hit the exact floor of
-the design (p = 0.0079, perfect separation) - which also exposed that the
-registered correction scheme could never have rejected at n = 5, an
-arithmetic error owned in DESIGN.md rather than buried.
+The sparse-reward adversary found zero severe failures on all seven seeds -
+worse than random noise - and every raw-shaped arm collapsed into reward
+farming (77-95% of late episodes end in timeout, hovering for shaped reward
+and never finishing the attack, median 0 failures). Every potential-based
+arm found them reliably, PORA best (median 13/200, never below 7). All six
+substantive contrasts reject after Holm correction (smallest Holm p =
+0.0052); the three that do not are exactly the ones that should not.
+
+Reaching that required owning an arithmetic error: the registered n = 5
+could not have rejected at 0.05 under *any* outcome (9 contrasts x the
+5-vs-5 floor of 0.0079 = 0.0714), so the seed count was raised uniformly to
+7 - within the registered ">= 5" - and the two new seeds are shown to look
+like the old ones rather than to have rescued the result.
 
 Getting there required retracting two things: the project's framing (dense
 shaping *is* defended in prior work - [RELATED_WORK.md](RELATED_WORK.md))

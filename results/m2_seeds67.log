@@ -35,3 +35,31 @@
 [04:31:47] (35/49) pora_pbrs_s5 skip (complete)
 [04:31:47] (36/49) sparse_raw_s6 train
 [04:31:47] (37/49) inv_ttc_raw_s6 train
+[04:31:47] (37/49) inv_ttc_raw_s6 eval
+[04:31:47] (36/49) sparse_raw_s6 eval
+[04:53:44] (38/49) neg_tts_margin_raw_s6 train
+[04:57:58] (39/49) pora_raw_s6 train
+[04:53:44] (38/49) neg_tts_margin_raw_s6 eval
+[05:21:09] (40/49) inv_ttc_pbrs_s6 train
+[04:57:58] (39/49) pora_raw_s6 eval
+[05:31:30] (41/49) neg_tts_margin_pbrs_s6 train
+[05:21:09] (40/49) inv_ttc_pbrs_s6 eval
+[05:43:46] (42/49) pora_pbrs_s6 train
+[05:31:30] (41/49) neg_tts_margin_pbrs_s6 eval
+[05:54:01] (43/49) sparse_raw_s7 train
+[05:43:46] (42/49) pora_pbrs_s6 eval
+[06:12:42] (44/49) inv_ttc_raw_s7 train
+[05:54:01] (43/49) sparse_raw_s7 eval
+[06:16:38] (45/49) neg_tts_margin_raw_s7 train
+[06:12:42] (44/49) inv_ttc_raw_s7 eval
+[06:16:38] (45/49) neg_tts_margin_raw_s7 eval
+[07:29:47] (46/49) pora_raw_s7 train
+[07:43:16] (47/49) inv_ttc_pbrs_s7 train
+[07:43:16] (47/49) inv_ttc_pbrs_s7 eval
+[08:43:02] (48/49) neg_tts_margin_pbrs_s7 train
+[07:29:47] (46/49) pora_raw_s7 eval
+[08:52:27] (49/49) pora_pbrs_s7 train
+[08:43:02] (48/49) neg_tts_margin_pbrs_s7 eval
+[08:52:27] (49/49) pora_pbrs_s7 eval
+
+[09:38:47] M2 batch finished in 5.1 h; 0 failed
