@@ -203,6 +203,18 @@ Positioning, prior work, and the framing this project had to retract are in
 
 ## Amendments
 
+* 2026-08-15 (post-M2 n=5, power error): §8 registered ">= 5 seeds" and
+  nine contrasts under Holm. Those two choices are mutually incompatible
+  and provably so without any data: at n = 5 the exact two-sided
+  Mann-Whitney floor is 2/C(10,5) = 0.0079, and Holm scales the smallest
+  p by 9, giving 0.0714 > 0.05. **The registered analysis could not reject
+  at 0.05 under any outcome.** Three contrasts did land exactly on the
+  floor (perfect separation). Extending to n = 7 (floor 0.00058, Holm
+  0.0052) is within the registered ">= 5" and is applied to all seven arms
+  uniformly, not only to arms that are ahead. Recorded here because the
+  decision was taken after seeing the n = 5 p-values, even though its
+  justification is arithmetic and pre-data.
+
 * 2026-08-14 (M2 halted at 24/35, gate corrected, batch restarted): the
   crash bonus was gated on fault only, and seeds 3-4 found the hole. Raw
   arms learned to grind the ego down to ~2 m/s and nudge it: the ego is the
