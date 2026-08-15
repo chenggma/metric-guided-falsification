@@ -26,7 +26,9 @@ import highway_env  # noqa: F401  (registers env ids)
 from highway_env.vehicle.kinematics import Vehicle
 
 from ..actors import ActorState, foes_within, from_vehicle
-from ..fault import TRIVIAL, coarse_crash_label
+from ..fault import ATTACKER_CRASH, THIRD_PARTY, coarse_crash_label
+
+PAID_OUTCOMES = frozenset({ATTACKER_CRASH, THIRD_PARTY})
 from ..metrics import METRICS
 from .sut import SUT
 
@@ -179,7 +181,11 @@ class AdversarialEnv(gym.Env):
             self._crash_paid = True
             att_s = from_vehicle(self.attacker)
             outcome = coarse_crash_label(ego_s, att_s, bool(self.attacker.crashed))
-            if outcome != TRIVIAL:  # no bonus for ramming the ego (DESIGN.md §5)
+            # Bonus only for a severe crash the SUT had the last clear chance
+            # to avoid. Paying for anything else is farmable: TRIVIAL lets the
+            # adversary ram, LOW_SPEED lets it grind the ego to a crawl and
+            # nudge (DESIGN.md §5, falsify/fault.py severity note).
+            if outcome in PAID_OUTCOMES:
                 reward += self.crash_bonus
         elif self.attacker.crashed and not ego.crashed:
             outcome = "attacker_crash"

@@ -18,6 +18,25 @@ liability model:
 * everything else (ego rear-ends a braking attacker after a cut-in, ego
   side-swipes during its own lane change, ego crashes a third party while
   reacting) -> non-trivial: the SUT had the last clear chance.
+
+**Severity gate (added 2026-08-14, after M2 seeds 3-4 exposed the hole).**
+Fault alone is not enough. Raw-shaped arms discovered that grinding the ego
+down to a crawl and nudging it satisfies every fault rule above: the ego is
+the striking party, so the crash paid the full bonus. Those "failures" were
+parking-speed contacts - median closing speed 2.5 m/s with the ego at
+2.1 m/s - and one seed produced 131 of them, outscoring every genuine
+result in the experiment. Pooling all labelled failures shows the two modes
+plainly (n=504: a mass at 2-4 m/s and a separate spread above 6 m/s), so
+the gate is set in the valley between them at
+
+    SEVERITY_MIN_CLOSING = 5.0 m/s  (18 km/h)
+
+A contact below that is a fender-bender, not a safety-critical event, and
+must not be counted as falsifying the SUT. The threshold is physical, not
+tuned: 5 m/s sits in the empirical valley, and the M2 conclusions are
+unchanged at 8 m/s (reported as a sensitivity row, results/M2.md). It was
+nonetheless chosen AFTER seeing data, which is recorded here and in
+DESIGN.md rather than quietly absorbed.
 """
 
 import math
@@ -27,11 +46,27 @@ from .actors import ActorState
 TRIVIAL = "ego_attacker_crash_trivial"
 ATTACKER_CRASH = "ego_attacker_crash"
 THIRD_PARTY = "ego_third_party_crash"
+LOW_SPEED = "ego_attacker_crash_low_speed"
+
+SEVERITY_MIN_CLOSING = 5.0
+
+
+def closing_speed(ego: ActorState, other: ActorState) -> float:
+    """Magnitude of the relative velocity - the severity proxy."""
+    return math.hypot(other.vx - ego.vx, other.vy - ego.vy)
 
 
 def coarse_crash_label(ego: ActorState, attacker: ActorState, attacker_crashed: bool) -> str:
     """Label an ego crash. `attacker_crashed` is highway-env's collision flag
-    for the attacker at the same step."""
+    for the attacker at the same step.
+
+    A crash below SEVERITY_MIN_CLOSING is LOW_SPEED regardless of fault: it
+    is a parking-speed contact, and paying the bonus for it lets the
+    adversary farm the crash gate instead of falsifying the SUT.
+    """
+    if closing_speed(ego, attacker) < SEVERITY_MIN_CLOSING:
+        return LOW_SPEED
+
     gap = math.hypot(attacker.x - ego.x, attacker.y - ego.y)
     touching = gap <= (ego.length + attacker.length)
     if not (attacker_crashed and touching):

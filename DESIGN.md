@@ -203,6 +203,30 @@ Positioning, prior work, and the framing this project had to retract are in
 
 ## Amendments
 
+* 2026-08-14 (M2 halted at 24/35, gate corrected, batch restarted): the
+  crash bonus was gated on fault only, and seeds 3-4 found the hole. Raw
+  arms learned to grind the ego down to ~2 m/s and nudge it: the ego is the
+  striking party, so every fault rule is satisfied and the full bonus pays.
+  One seed produced 131 such "failures" - more than any genuine result in
+  the experiment - at a median closing speed of 2.5 m/s with the ego at
+  2.1 m/s. These are parking-speed contacts, not falsifications.
+  **This is a second reward-hacking mode, distinct from the farming mode
+  the pilot found**: farming games the *shaped* term by never finishing;
+  creeping games the *bonus* term by finishing cheaply. Both are plausible
+  behaviour, so neither is caught by plausibility constraints.
+  Fix: a severity floor (closing speed >= 5.0 m/s) checked *before* fault,
+  in the reward and in the analysis alike (falsify/fault.py). The threshold
+  is physical and sits in the empirical valley between the two modes
+  (n = 504 labelled failures: a mass at 2-4 m/s, a separate spread above
+  6 m/s); conclusions are unchanged at 8 m/s.
+  **It was nevertheless chosen after seeing data.** Consequences, recorded
+  rather than absorbed: (a) the 24 completed runs trained against the
+  farmable gate and are preserved unmodified at `results/m2_oldgate/` as
+  the evidence for this finding; (b) they cannot serve as the raw-vs-PBRS
+  test, because the raw arms were *paid* to creep, which confounds their
+  poor severe-failure counts; (c) M2 restarts from zero with the corrected
+  gate, all 7 arms x 5 seeds. Hypotheses are unchanged.
+
 * 2026-08-14 (M0, pre-results): two changes driven by smoke testing, made
   before any training run existed. (1) Fixed-angle steering bound replaced
   by a lateral-acceleration bound (fixed 0.3 rad at highway speed is a

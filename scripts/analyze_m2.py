@@ -20,6 +20,23 @@ import numpy as np
 from falsify.stats import bootstrap_ci, holm, mannwhitney_exact
 
 NON_TRIVIAL = {"ego_attacker_crash", "ego_third_party_crash"}
+# Severity floor, applied here as well as in the reward so that runs logged
+# BEFORE the gate existed are scored the same way as runs logged after.
+# See falsify/fault.py for why 5.0 m/s and how it was chosen.
+SEVERITY_MIN_CLOSING = 5.0
+
+
+def is_failure(rec, min_closing=SEVERITY_MIN_CLOSING):
+    """A severe, SUT-attributable failure: correct fault label AND a closing
+    speed above the fender-bender floor."""
+    if rec["outcome"] not in NON_TRIVIAL:
+        return False
+    snap = rec.get("crash_snapshot")
+    if not snap:
+        return False
+    return snap["closing_speed"] >= min_closing
+
+
 METRIC_NAMES = ("inv_ttc", "neg_tts_margin", "pora")
 
 # Deterministic failure-mode grid (no clustering library, no random seed):
@@ -76,7 +93,7 @@ def collect(root):
 
 def per_seed_nontrivial(runs_for_arm):
     return [
-        sum(1 for r in v["eval"] if r["outcome"] in NON_TRIVIAL)
+        sum(1 for r in v["eval"] if is_failure(r))
         for _, v in sorted(runs_for_arm.items())
     ]
 
@@ -179,8 +196,7 @@ def main(a):
     for key in sorted(runs, key=lambda k: (k[1], k[0])):
         cells_per_seed, union = [], set()
         for _, v in sorted(runs[key].items()):
-            cs = {cell(r["crash_snapshot"]) for r in v["eval"]
-                  if r["outcome"] in NON_TRIVIAL and r.get("crash_snapshot")}
+            cs = {cell(r["crash_snapshot"]) for r in v["eval"] if is_failure(r)}
             cells_per_seed.append(len(cs))
             union |= cs
         if not any(cells_per_seed):
@@ -201,7 +217,7 @@ def main(a):
         vals = {m: [] for m in METRIC_NAMES}
         for _, v in sorted(runs[key].items()):
             for r in v["eval"]:
-                if r["outcome"] in NON_TRIVIAL:
+                if is_failure(r):
                     for m in METRIC_NAMES:
                         if m in r.get("max_metrics", {}):
                             vals[m].append(r["max_metrics"][m])
