@@ -17,7 +17,7 @@ metric supplies the term. This project asks one narrow empirical question:
 
 Third repository in a sequence:
 [pora-replication](https://github.com/chenggma/pora-replication)
-(independent implementation of the PORA metric) →
+(unofficial reimplementation of the PORA metric) →
 [risk-metric-bench](https://github.com/chenggma/risk-metric-bench)
 (passive scoring: PORA wins AUROC but its fixed-FPR alarm fires latest) →
 **this** (the metric becomes the optimization target of an active
